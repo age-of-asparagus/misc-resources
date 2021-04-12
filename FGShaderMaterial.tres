@@ -1,18 +1,18 @@
 [gd_resource type="ShaderMaterial" load_steps=10 format=2]
 
-[sub_resource type="VisualShaderNodeInput" id=1]
-input_name = "color"
+[sub_resource type="VisualShaderNodeVectorDecompose" id=1]
 
-[sub_resource type="VisualShaderNodeVectorDecompose" id=2]
+[sub_resource type="VisualShaderNodeColorUniform" id=2]
+uniform_name = "ForegroundColor3"
 
-[sub_resource type="VisualShaderNodeColorUniform" id=3]
-uniform_name = "ForegroundColor"
+[sub_resource type="VisualShaderNodeVectorScalarMix" id=3]
+default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ), 2, 0.0 ]
 
 [sub_resource type="VisualShaderNodeColorUniform" id=4]
-uniform_name = "BackgroundColor"
+uniform_name = "BackgroundColor3"
 
-[sub_resource type="VisualShaderNodeVectorScalarMix" id=5]
-default_input_values = [ 0, Vector3( 0, 0, 0 ), 1, Vector3( 1, 1, 1 ), 2, 0.0 ]
+[sub_resource type="VisualShaderNodeInput" id=5]
+input_name = "color"
 
 [sub_resource type="VisualShaderNodeInput" id=6]
 input_name = "vertex"
@@ -26,8 +26,8 @@ input_name = "world"
 code = "shader_type spatial;
 render_mode specular_schlick_ggx;
 
-uniform vec4 BackgroundColor : hint_color;
-uniform vec4 ForegroundColor : hint_color;
+uniform vec4 BackgroundColor3 : hint_color;
+uniform vec4 ForegroundColor3 : hint_color;
 
 
 
@@ -47,27 +47,27 @@ void vertex() {
 }
 
 void fragment() {
-// ColorUniform:6
-	vec3 n_out6p0 = BackgroundColor.rgb;
-	float n_out6p1 = BackgroundColor.a;
-
 // ColorUniform:5
-	vec3 n_out5p0 = ForegroundColor.rgb;
-	float n_out5p1 = ForegroundColor.a;
+	vec3 n_out5p0 = BackgroundColor3.rgb;
+	float n_out5p1 = BackgroundColor3.a;
 
-// Input:3
-	vec3 n_out3p0 = COLOR.rgb;
+// ColorUniform:3
+	vec3 n_out3p0 = ForegroundColor3.rgb;
+	float n_out3p1 = ForegroundColor3.a;
 
-// VectorDecompose:4
-	float n_out4p0 = n_out3p0.x;
-	float n_out4p1 = n_out3p0.y;
-	float n_out4p2 = n_out3p0.z;
+// Input:6
+	vec3 n_out6p0 = COLOR.rgb;
 
-// VectorScalarMix:7
-	vec3 n_out7p0 = mix(n_out6p0, n_out5p0, n_out4p2);
+// VectorDecompose:2
+	float n_out2p0 = n_out6p0.x;
+	float n_out2p1 = n_out6p0.y;
+	float n_out2p2 = n_out6p0.z;
+
+// VectorScalarMix:4
+	vec3 n_out4p0 = mix(n_out5p0, n_out3p0, n_out2p2);
 
 // Output:0
-	ALBEDO = n_out7p0;
+	ALBEDO = n_out4p0;
 
 }
 
@@ -76,29 +76,29 @@ void light() {
 
 }
 "
-graph_offset = Vector2( -22.4, -174.6 )
-nodes/vertex/0/position = Vector2( 1000, 100 )
+graph_offset = Vector2( 128, -199.2 )
+nodes/vertex/0/position = Vector2( 980, 0 )
 nodes/vertex/2/node = SubResource( 6 )
-nodes/vertex/2/position = Vector2( 60, 240 )
+nodes/vertex/2/position = Vector2( 140, 180 )
 nodes/vertex/3/node = SubResource( 7 )
-nodes/vertex/3/position = Vector2( 60, 140 )
+nodes/vertex/3/position = Vector2( 140, 80 )
 nodes/vertex/4/node = SubResource( 8 )
-nodes/vertex/4/position = Vector2( 300, 100 )
+nodes/vertex/4/position = Vector2( 380, 40 )
 nodes/vertex/connections = PoolIntArray( 3, 0, 4, 0, 2, 0, 4, 1, 4, 0, 0, 6 )
-nodes/fragment/0/position = Vector2( 820, -160 )
-nodes/fragment/3/node = SubResource( 1 )
-nodes/fragment/3/position = Vector2( 0, 80 )
-nodes/fragment/4/node = SubResource( 2 )
-nodes/fragment/4/position = Vector2( 260, 140 )
-nodes/fragment/5/node = SubResource( 3 )
-nodes/fragment/5/position = Vector2( 240, -160 )
-nodes/fragment/6/node = SubResource( 4 )
-nodes/fragment/6/position = Vector2( 240, -20 )
-nodes/fragment/7/node = SubResource( 5 )
-nodes/fragment/7/position = Vector2( 540, -160 )
-nodes/fragment/connections = PoolIntArray( 3, 0, 4, 0, 7, 0, 0, 0, 4, 2, 7, 2, 5, 0, 7, 1, 6, 0, 7, 0 )
+nodes/fragment/0/position = Vector2( 1000, -180 )
+nodes/fragment/2/node = SubResource( 1 )
+nodes/fragment/2/position = Vector2( 460, 120 )
+nodes/fragment/3/node = SubResource( 2 )
+nodes/fragment/3/position = Vector2( 440, -180 )
+nodes/fragment/4/node = SubResource( 3 )
+nodes/fragment/4/position = Vector2( 720, -180 )
+nodes/fragment/5/node = SubResource( 4 )
+nodes/fragment/5/position = Vector2( 440, -40 )
+nodes/fragment/6/node = SubResource( 5 )
+nodes/fragment/6/position = Vector2( 200, 60 )
+nodes/fragment/connections = PoolIntArray( 3, 0, 4, 1, 5, 0, 4, 0, 2, 2, 4, 2, 4, 0, 0, 0, 6, 0, 2, 0 )
 
 [resource]
 shader = SubResource( 9 )
-shader_param/BackgroundColor = Color( 0, 0.160784, 1, 1 )
-shader_param/ForegroundColor = Color( 1, 0, 0, 1 )
+shader_param/BackgroundColor3 = Color( 1, 0, 0, 1 )
+shader_param/ForegroundColor3 = Color( 0.168627, 0, 0.898039, 1 )
